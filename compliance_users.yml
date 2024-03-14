@@ -1,0 +1,29 @@
+---
+- name: Compliance Check - user accounts
+
+  hosts: all
+
+  tasks:
+    - name: Permitted user accounts
+      cisco.ios.ios_user:
+        aggregate:
+          - name: <user1 removed>
+            hashed_password:
+              type: 9
+              value: <hashed password removed>
+            update_password: on_create
+          - name: <user2 removed>
+            hashed_password:
+              type: 9
+              value: <hashed password removed>
+            update_password: on_create
+        privilege: 15
+        purge: true
+      no_log: true
+      notify: "Save config if modified"
+
+  handlers:
+    - name: Save config if modified
+      cisco.ios.ios_command:
+        commands: "write mem"
+      when: not ansible_check_mode
