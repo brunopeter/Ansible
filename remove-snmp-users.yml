@@ -1,0 +1,14 @@
+---
+- name: Just the Facts
+  cisco.ios.ios_facts:
+    gather_network_resources:
+      - snmp_server
+
+- name: "SNMP user cleanup"
+  cisco.ios.ios_config:
+    lines: "no snmp-server user {{ snmp_user.username }} {{ snmp_user.group }} {{snmp_user.version }}"
+  loop:
+    "{{ ansible_facts.network_resources.snmp_server.users }}"
+  loop_control:
+    loop_var: snmp_user
+#  when: snmp_user.username not in ['keep_user_1', 'keep_user_2']
