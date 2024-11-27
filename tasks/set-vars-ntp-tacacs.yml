@@ -1,0 +1,63 @@
+---
+- name: "Get vars from region-var-reference.yml"
+  ansible.builtin.include_vars:
+    file: "./inventory/group_vars/region-var-reference.yml"
+
+- name: "net_hostname - remove whitespace"
+  # Device may have whitespace as part of hostname, remove it before parsing.
+  ansible.builtin.set_fact:
+    device_hostname: "{{ ansible_facts.net_hostname | trim }}"
+
+- name: "Parse device name & set facts"
+  ansible.builtin.set_fact:
+    # device_state: "{{ ansible_facts.net_hostname[0:2] }}"
+    # device_lidfac: "{{ ansible_facts.net_hostname[0:12] }}"
+    device_state: "{{ device_hostname[0:2] }}"
+    device_lidfac: "{{ device_hostname[0:12] }}"
+
+# settings based on East / West assignments
+- name: "Set facts Tacacs/NTP ESA"
+  ansible.builtin.set_fact:
+    tacacs_servers: "{{ ESA.Tacacs_Servers }}"
+    ntp_servers: "{{ ESA.NTP_Servers }}"
+  when:
+    device_state in
+    [ 'ME', 'VT', 'NH', 'CT', 'MA', 'RI',
+      'NY', 'NJ', 'PA', 'DE', 'MD', 'WV', 'VA',
+      'NC', 'SC', 'GA', 'FL', 'AL', 'MS', 'TN', 'KY',
+      'OH', 'IN', 'MI', 'WI', 'IL']
+
+- name: "Set facts Tacacs/NTP CSA"
+  ansible.builtin.set_fact:
+    tacacs_servers: "{{ CSA.Tacacs_Servers }}"
+    ntp_servers: "{{ CSA.NTP_Servers }}"
+  when:
+    device_state in
+    [ 'ND', 'SD', 'MN', 'WI', 'IL', 'IN', 'MI',
+      'NE', 'IA', 'KS', 'MO',
+      'NM', 'TX', 'OK', 'AR', 'LA']
+
+- name: "Set facts Tacacs/NTP WSA"
+  ansible.builtin.set_fact:
+    tacacs_servers: "{{ WSA.Tacacs_Servers }}"
+    ntp_servers: "{{ WSA.NTP_Servers }}"
+  when:
+    device_state in
+    [ 'WA', 'OR', 'MT', 'WY', 'CO', 'UT', 'ID',
+      'MN', 'SD', 'ND', 'IA', 'MO', 'KS', 'NE', 'AR', 'LA', 'TX', 'OK', 'NM',
+      'CA', 'NV', 'AZ', 'HI', 'AK']
+
+- name: "Set facts Tacacs/NTP ACY / DC-RWA HQ"
+  ansible.builtin.set_fact:
+    tacacs_servers: "{{ ACY_HQ.Tacacs_Servers }}"
+    ntp_servers: "{{ ACY_HQ.NTP_Servers }}"
+  when:
+    device_lidfac in ['NJ-ACY-WJHTC', 'DC-RWA-HDQ0']
+
+# - name: Debugging2
+#   ansible.builtin.debug:
+#     msg: 
+#       - "device_state: {{ device_state }} -- device_lidfac: {{ device_lidfac }}"
+#       - "{{ ansible_facts.net_hostname }}"
+#       - "Tacacs: {{ tacacs_servers }}"
+#       - "NTP: {{ ntp_servers }}"

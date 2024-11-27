@@ -1,0 +1,16 @@
+---
+# Intent is to remove config lines based on results of show command
+- name: Show command
+  cisco.ios.ios_command:
+    commands: 
+      - "show run | inc <your config to remove here>"
+  register: output
+
+- name: Remove lines from config
+  ansible.netcommon.cli_config:
+    config: "{{ remove_item }}"
+  loop: "{{ output.stdout_lines[0] | map('regex_replace', '^', 'no ') }}"
+  loop_control:
+    loop_var: remove_item
+  when: output.stdout[0] | length > 0
+  

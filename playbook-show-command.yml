@@ -1,0 +1,36 @@
+---
+- name: "Run Show Command"
+  hosts: "{{ _hosts }}"
+  gather_facts: false
+  vars:
+      _command: "show ip interface brief | exclude unassigned"
+
+# Run specified command on host.
+# Only supports 'show' commands to prevent accidental misuse
+# e.g. prevent 'reboot' or 'write erase' commands being issued
+# Expect: '_show_command' will be overridden on run in most cases
+
+  tasks:
+    - name: "Run command when it starts with 'sh'"
+      block: 
+        - name: Show command
+          cisco.ios.ios_command:
+            commands: "{{ _command }}"
+          register: output
+
+
+        - name: Results
+          ansible.builtin.debug:
+            msg:
+              - "Results of: {{ _command }}"
+              - "{{ output.stdout_lines }}"
+      when: _command.startswith('sh')
+
+
+    - name: Invalid Command
+      ansible.builtin.debug:
+          msg:
+            - "Bad command: '{{ _command }}'"
+            - "This playbok only supports 'SHOW' commands."
+            - "Command execution skipped."
+      when: not _command.startswith('sh')

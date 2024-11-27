@@ -1,0 +1,14 @@
+---
+- name: Gather facts
+  hosts: all
+  gather_facts: false
+
+  tasks:
+  - name: "Collect Data - ansible_facts"
+    ansible.builtin.setup:
+      #gather_subset: interfaces
+    register: output
+
+  - name: "Print Data"
+    debug:
+      msg: '{{ output }}'

@@ -1,0 +1,8 @@
+---
+- name: "Object Group"
+  ansible.builtin.include_tasks:
+    file: "object-group.yml"
+
+- name: "Access List"
+  ansible.builtin.include_tasks:
+    file: "access-list.yml"

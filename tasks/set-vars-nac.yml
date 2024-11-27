@@ -1,0 +1,178 @@
+---
+- name: "Get vars from region-var-reference.yml"
+  ansible.builtin.include_vars:
+    file: "./inventory/group_vars/region-var-reference.yml"
+
+- name: "net_hostname - remove whitespace"
+  # Device may have whitespace as part of hostname, remove it before parsing.
+  ansible.builtin.set_fact:
+    device_hostname: "{{ ansible_facts.net_hostname | trim }}"
+
+- name: "Parse device name & set facts"
+  ansible.builtin.set_fact:
+    # device_state: "{{ ansible_facts.net_hostname[0:2] }}"
+    # device_lidfac: "{{ ansible_facts.net_hostname[0:12] }}"
+    device_state: "{{ device_hostname[0:2] }}"
+    device_lidfac: "{{ device_hostname[0:12] }}"
+
+# settings based on NAC appliance mapping assignments
+- name: "Set facts NAC NESA"
+  ansible.builtin.set_fact:
+    nac_radius4: "{{ NAC_NESA.Radius4 }}"
+    nac_radius6: "{{ NAC_NESA.Radius6 }}"
+  when:
+    device_state in
+    [ 'ME', 'VT', 'NH', 'CT', 'MA', 'RI']
+
+- name: "Set facts NAC CESA"
+  ansible.builtin.set_fact:
+    nac_radius4: "{{ NAC_CESA.Radius4 }}"
+    nac_radius6: "{{ NAC_CESA.Radius6 }}"
+  when:
+    device_state in
+     [ 'NY', 'NJ', 'PA', 'DE', 'MD', 'WV', 'VA']
+
+- name: "Set facts NAC SESA"
+  ansible.builtin.set_fact:
+    nac_radius4: "{{ NAC_SESA.Radius4 }}"
+    nac_radius6: "{{ NAC_SESA.Radius6 }}"
+  when:
+    device_state in     
+    [ 'NC', 'SC', 'GA', 'FL', 'AL', 'MS', 'TN', 'KY']
+
+- name: "Set facts NAC NCSA"
+  ansible.builtin.set_fact:
+    nac_radius4: "{{ NAC_NCSA.Radius4 }}"
+    nac_radius6: "{{ NAC_NCSA.Radius6 }}"
+  when:
+    device_state in
+    [ 'OH', 'IN', 'MI', 'WI', 'IL']
+
+- name: "Set facts NAC CCSA"
+  ansible.builtin.set_fact:
+    nac_radius4: "{{ NAC_CCSA.Radius4 }}"
+    nac_radius6: "{{ NAC_CCSA.Radius6 }}"
+  when:
+    device_state in    
+    [ 'ND', 'SD', 'MN', 'WI', 'NE', 'IA', 'KS', 'MO']
+
+- name: "Set facts NAC SCSA"
+  ansible.builtin.set_fact:
+    nac_radius4: "{{ NAC_SCSA.Radius4 }}"
+    nac_radius6: "{{ NAC_SCSA.Radius6 }}"
+  when:
+    device_state in  
+    [ 'NM', 'TX', 'OK', 'AR', 'LA', 'NV', 'AZ']
+
+- name: "Set facts NAC NWSA"
+  ansible.builtin.set_fact:
+    nac_radius4: "{{ NAC_NWSA.Radius4 }}"
+    nac_radius6: "{{ NAC_NWSA.Radius6 }}"
+  when:
+    device_state in
+    [ 'WA', 'OR', 'MT', 'WY', 'CO', 'UT', 'ID', 'CA', 'HI']
+
+- name: "Set facts AK - Alaska"
+  ansible.builtin.set_fact:
+    nac_radius4: "{{ NAC_AK.Radius4 }}"
+    nac_radius6: "{{ NAC_AK.Radius6 }}"
+  when:
+    device_state in ['AK']
+
+- name: "Set facts ACY"
+  ansible.builtin.set_fact:
+    nac_radius4: "{{ NAC_ACY.Radius4 }}"
+    nac_radius6: "{{ NAC_ACY.Radius6 }}"
+  when:
+    device_lidfac in ['NJ-ACY-WJHTC']
+
+# - name: "Set facts AMC"
+#   ansible.builtin.set_fact:
+#     nac_radius4: "{{ NAC_AMC.Radius4 }}"
+#     nac_radius6: "{{ NAC_AMC.Radius6 }}"
+#   when:
+#     device_lidfac in ['OK-AMC-HDQ'] ???
+
+- name: "Set facts AWA / HQ"
+  ansible.builtin.set_fact:
+    nac_radius4: "{{ NAC_AWA.Radius4 }}"
+    nac_radius6: "{{ NAC_AWA.Radius6 }}"
+  when:
+    device_lidfac in ['DC-RWA-HDQ0']
+
+- name: "Set facts ANE / MA-RBN-HDQ"
+  ansible.builtin.set_fact:
+    nac_radius4: "{{ NAC_ANE.Radius4 }}"
+    nac_radius6: "{{ NAC_ANE.Radius6 }}"
+  when:
+    device_lidfac in ['MA-RBN-HDQ0']
+
+- name: "Set facts AEA / NY-AFD-HDQ"
+  ansible.builtin.set_fact:
+    nac_radius4: "{{ NAC_AEA.Radius4 }}"
+    nac_radius6: "{{ NAC_AEA.Radius6 }}"
+  when:
+    device_lidfac in ['NY-AFD-HDQ']
+
+- name: "Set facts ASO / GA-RTL-HDQ"
+  ansible.builtin.set_fact:
+    nac_radius4: "{{ NAC_ASO.Radius4 }}"
+    nac_radius6: "{{ NAC_ASO.Radius6 }}"
+  when:
+    device_lidfac in ['GA-RTL-HDQ']
+
+- name: "Set facts AGL / IL-RGC-HDQ"
+  ansible.builtin.set_fact:
+    nac_radius4: "{{ NAC_AGL.Radius4 }}"
+    nac_radius6: "{{ NAC_AGL.Radius6 }}"
+  when:
+    device_lidfac in ['IL-RGC-HDQ']
+
+- name: "Set facts ACE / MO-CAF-HDQ"
+  ansible.builtin.set_fact:
+    nac_radius4: "{{ NAC_CAF.Radius4 }}"
+    nac_radius6: "{{ NAC_CAF.Radius6 }}"
+  when:
+    device_lidfac in ['MO-CAF-HDQ']
+
+- name: "Set facts ASW / TX-FTW-HDQ"
+  ansible.builtin.set_fact:
+    nac_radius4: "{{ NAC_ASW.Radius4 }}"
+    nac_radius6: "{{ NAC_ASW.Radius6 }}"
+  when:
+    device_lidfac in ['TX-FTW-HDQ']
+
+- name: "Set facts AAL / AK-ANC-HDQ"
+  ansible.builtin.set_fact:
+    nac_radius4: "{{ NAC_AAL.Radius4 }}"
+    nac_radius6: "{{ NAC_AAL.Radius6 }}"
+  when:
+    device_lidfac in ['AK-ANC-HDQ']
+
+- name: "Set facts ANM / WA-SEA-HDQ"
+  ansible.builtin.set_fact:
+    nac_radius4: "{{ NAC_ANM.Radius4 }}"
+    nac_radius6: "{{ NAC_ANM.Radius6 }}"
+  when:
+    device_lidfac in ['WA-SEA-HDQ']
+
+- name: "Set facts AWP / CA-AWP-HDQ"
+  ansible.builtin.set_fact:
+    nac_radius4: "{{ NAC_AWP.Radius4 }}"
+    nac_radius6: "{{ NAC_AWP.Radius6 }}"
+  when:
+    device_lidfac in ['CA-AWP-HDQ']
+
+# - name: Debugging2
+#   ansible.builtin.debug:
+#     msg: 
+#       - "device_state: {{ device_state }} -- device_lidfac: {{ device_lidfac }}"
+#       - "{{ ansible_facts.net_hostname }}"
+#       - "NAC4: {{ nac_radius4 }}"
+#       - "NAC4-1 client {{ nac_radius4[0] }}"
+#       - "NAC4-2 client {{ nac_radius4[1] }}"
+#       - "NAC4-3 client {{ nac_radius4[2] }}"
+#       - "NAC6: {{ nac_radius6 }}"
+#       - "NAC6-1 client {{ nac_radius6[0] }}"
+#       - "NAC6-2 client {{ nac_radius6[1] }}"
+#       - "NAC6-3 client {{ nac_radius6[2] }}"

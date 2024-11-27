@@ -1,0 +1,49 @@
+---
+# 1. gather layer-2 interfaces
+# 2. loop over interfaces where mode is 'access'
+#     and set commands required for NAC / ClearPass
+
+- name: "Gather layer-2 interfaces  #1"
+  cisco.ios.ios_facts:
+    gather_subset:
+      # - "!all"
+      - "all"
+    gather_network_resources:
+      # - "l3_interfaces"
+      - "l2_interfaces"
+
+- name: "Remove Port Security"
+  cisco.ios.ios_config:
+    before:
+      ## - remove port-security settings if present
+      - "interface {{ interface_loop }}"
+      # - switchport port-security maximum 2
+      # - switchport port-security maximum 1 vlan access
+      # - switchport port-security maximum 1 vlan voice
+      # - switchport port-security violation restrict
+      # - switchport port-security aging time 1
+      # - switchport port-security
+    parents: 
+      "interface {{ interface_loop }}"
+    lines:
+      -  
+  loop:
+    "{{ ansible_network_resources.l2_interfaces
+        | selectattr('access', 'defined')
+        | map(attribute='name')
+        | list }}"
+  loop_control:
+    loop_var: interface_loop
+  # register: l2interfaces
+
+# - name: debug
+#   debug:
+#     msg:
+#       - "-----STEP-1-----------------------------------------------"
+# #       - "{{ helperupdate }}"
+# #       - "{{ ansible_network_resources.l3_interfaces }}"
+#       - "-----STEP-2-----------------------------------------------"
+#       - "{{ ansible_network_resources.l2_interfaces
+#           | selectattr('access', 'defined')
+#           | map(attribute='name')
+#           | list }}"

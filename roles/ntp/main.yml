@@ -1,0 +1,4 @@
+---
+- name: "Update NTP Setters per region"
+  ansible.builtin.include_tasks:
+    file: "ntp.yml"

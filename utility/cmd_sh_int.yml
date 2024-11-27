@@ -1,0 +1,16 @@
+---
+- import_playbook: login.yml
+- name: Check connectivity
+  hosts: all
+  gather_facts: yes
+  connection: cisco.ios
+
+  tasks:
+    - name: Show Interfaces 
+      ios_command:
+        commands: show ip interface brief
+      register: output
+
+    - name: Print output
+      debug:
+        msg: "{{ output.stdout_lines }}"

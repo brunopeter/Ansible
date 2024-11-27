@@ -1,0 +1,82 @@
+---
+# Remove insecure SSH ciphers from Cisco gear
+## Requires  cisco.ios.ios_facts for device specific action
+# reference:  https://networkproguide.com/disable-weak-ssh-ssl-ciphers-cisco-ios/
+
+- name: "SSH Cipher Cleanup: C9300, C9200, C3850, C3650"
+  cisco.ios.ios_config:
+    lines:
+      - "ip ssh version 2"
+      ### leave strong ciphers & algoriths only
+      - "ip ssh server algorithm encryption aes128-gcm aes256-gcm aes128-ctr aes192-ctr aes256-ctr aes256-cbc aes192-cbc aes128-cbc"
+      - "ip ssh server algorithm mac hmac-sha2-256 hmac-sha2-512"
+      ### Minimum key size for clients
+      - "ip ssh dh min size 4096"
+      ### http/s should be disabled, but remove week ciphers and set tls version just in case
+      - "ip http secure-ciphersuite aes-256-cbc-sha"
+      - "ip http tls-version TLSv1.2"
+  when: 
+    (ansible_facts.net_model[0:8] in 
+    ['WS-C3850', 'WS-C3650'])
+    or 
+    (ansible_facts.net_model[0:6] in 
+    ['C9300-', 'C9200-'])
+
+- name: "SSH Cipher Cleanup: C3560"
+  cisco.ios.ios_config:
+    lines:
+      - "ip ssh version 2"
+      ### leave strong ciphers & algoriths only
+      - "ip ssh server algorithm encryption aes128-ctr aes192-ctr aes256-ctr aes256-cbc aes192-cbc aes128-cbc"
+      - "ip ssh server algorithm mac hmac-sha2-256 hmac-sha2-512"
+      ### Minimum key size for clients
+      - "ip ssh dh min size 4096"
+      ### http/s should be disabled, but remove week ciphers and set tls version just in case
+      - "ip http secure-ciphersuite aes-256-cbc-sha"
+      - "ip http tls-version TLSv1.2"
+  when: 
+    ansible_facts.net_model[0:8] in 
+    ['WS-C3560']
+
+- name: "SSH Cipher Cleanup: C4500s"
+  cisco.ios.ios_config:
+    lines:
+      - "ip ssh version 2"
+      ### leave strong ciphers & algoriths only
+      - "ip ssh server algorithm encryption aes256-ctr aes256-cbc aes192-ctr aes192-cbc aes128-ctr aes128-cbc"
+      - "ip ssh server algorithm mac hmac-sha2-512 hmac-sha2-256"
+      ### Minimum key size for clients
+      - "ip ssh dh min size 4096"
+      ### http/s should be disabled, but remove week ciphers and set tls version just in case
+      - "ip http secure-ciphersuite aes-256-cbc-sha"
+      - "ip http tls-version TLSv1.2"
+  when: 
+    ansible_facts.net_model in 
+    ['WS-C4503-E',
+    'WS-C4506', 'WS-C4506-E'
+    'WS-C4507R-E', 'WS-C4507R+E',
+    'WS-C4510R', 'WS-C4510R+E']
+
+# - name: testing
+#   ansible.builtin.debug:
+#     msg: "{{ ansible_facts.net_model[0:7] }}"
+
+# - name: testing 2
+#   ansible.builtin.debug:
+#     msg: "working 4500! {{ ansible_facts.net_model }}"
+#   when: ansible_facts.net_model in 
+#     ['WS-C4503-E',
+#     'WS-C4506',
+#     'WS-C4506-E'
+#     'WS-C4507R-E',
+#     'WS-C4507R+E',
+#     'WS-C4510R',
+#     'WS-C4510R+E']
+
+# - name: testing 3
+#   ansible.builtin.debug:
+#     msg: "working non-4500! {{ ansible_facts.net_model }}"
+#   when: ansible_facts.net_model[0:8] in 
+#     ['WS-C9300', 'WS-C9200', 
+#     'WS-C3850', 'WS-C3650', 
+#     'WS-C3560']

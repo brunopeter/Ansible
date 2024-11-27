@@ -1,0 +1,12 @@
+---
+# Delete old access-lists
+- name: "NAC snmp cleanup"
+  cisco.ios.ios_acls:
+    state: deleted
+    config:
+      - afi: ipv4
+        acls:
+          - name: snmp3NAC
+          - name: snmp3NAC-20191001
+          - name: snmp3NAC-5
+          - name: snmp3NAC-6

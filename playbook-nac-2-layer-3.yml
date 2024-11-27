@@ -1,0 +1,38 @@
+---
+- name: "NAC IP Helper Update"
+  hosts: "{{ _hosts }}"
+  # strategy: ansible.builtin.free
+  gather_facts: false
+
+  vars:
+    ansible_command_timeout: 240
+    merged_acl: ""
+
+  tasks:
+    - name: "Gather ACL facts"
+      cisco.ios.ios_acls:
+        state: gathered
+      register: acls
+
+    - name: "Lookup and set IP helper variables"
+      ansible.builtin.include_tasks:
+        file: "./tasks/set-vars-helper.yml"
+
+    - name: "Update IP helper settings"
+      ansible.builtin.include_tasks:
+        file: "./tasks/dhcp-interface-update.yml"
+
+    - name: "Apply ACLs and Object groups"
+      ansible.builtin.include_tasks:
+        file: "./tasks/acls_obj_groups.yml"
+
+    # TODO:
+    # - task: cisco.ios.ios_acls: gather ACLs
+    # - task: compare configured acls to j2 templates
+    #     if acl missing / not correct applly template
+
+ 
+    # - name: Save when modified
+    #   cisco.ios.ios_config:
+    #     # save_when: changed
+    #     save_when: modified

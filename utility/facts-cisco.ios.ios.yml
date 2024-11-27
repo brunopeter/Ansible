@@ -1,0 +1,16 @@
+---
+- name: Gather information from routers
+  hosts: all
+  gather_facts: false
+
+  tasks:
+  - name: "Collect Data - cisco.ios.ios_facts"
+    cisco.ios.ios_facts:
+    #  gather_subset: 'all'
+      gather_network_resources:
+        - "l2_interfaces"
+    register: output
+
+  - name: "Print Data"
+    debug:
+      msg: '{{ output }}'

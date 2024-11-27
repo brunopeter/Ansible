@@ -1,0 +1,65 @@
+---
+- name: NAC commands other
+  cisco.ios.ios_config:
+    lines:
+      - dot1x system-auth-control
+      - authentication mac-move permit
+      - radius-server attribute 11 default direction in
+      - radius-server attribute 32 include-in-access-req 
+      - radius-server attribute 32 include-in-accounting-req
+      # - radius-server deadtime 5
+      - radius-server deadtime 30
+      # - radius-server dead-criteria time 5 tries 3
+      - radius-server dead-criteria time 3 tries 3
+      - "radius-server attribute 4 {{ mgmt_ipv4 }}"
+
+- name: NAC radius attribute 95
+  cisco.ios.ios_config:
+    lines:
+      - "radius-server attribute 95 {{ mgmt_ipv6 | upper }}"
+  when:
+      mgmt_ipv6 | length > 0
+
+- name: Radius - Clearpass4
+  cisco.ios.ios_config:
+    parents:
+      - "radius server Clearpass4-{{ ansible_loop.index }}"
+    lines:
+      - "address ipv4 {{ nac4 }} auth-port 1812 acct-port 1813"
+      - "key 7 {{ vault_nac_radius_key }}"
+  loop: "{{ nac_radius4 }}"
+  loop_control:
+    extended: true
+    loop_var: nac4
+
+- name: Radius - Clearpass6
+  cisco.ios.ios_config:
+    parents:
+      - "radius server Clearpass6-{{ ansible_loop.index }}"
+    lines:
+      - "address ipv6 {{ nac6 | upper }} auth-port 1812 acct-port 1813"
+      - "key 7 {{ vault_nac_radius_key }}"
+  loop:  "{{ nac_radius6 }}"
+  loop_control:
+    extended: true
+    loop_var: nac6
+
+- name: Radius - Dynamic-author
+  cisco.ios.ios_config:
+    replace: block
+    before:
+      - no aaa server radius dynamic-author
+    parents:
+      - aaa server radius dynamic-author
+    lines:
+      - "client {{ nac_radius4[0] }}"
+      - "client {{ nac_radius4[1] }}"
+      - "client {{ nac_radius4[2] }}"
+      - "client {{ nac_radius4[3] }}"
+      - "client {{ nac_radius6[0] }}"
+      - "client {{ nac_radius6[1] | upper }}"
+      - "client {{ nac_radius6[2] | upper }}"
+      - "client {{ nac_radius6[3] | upper }}"
+      - "server-key 7 {{ vault_nac_radius_key }}"
+      - "port 3799"
+      - "auth-type all"

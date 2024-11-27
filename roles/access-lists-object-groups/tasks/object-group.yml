@@ -1,0 +1,22 @@
+---
+- name: "Import Object-Groups and update"
+  block:
+    - name: Batch Object-Group file import
+      ansible.utils.cli_parse:
+        text: "{{ lookup('ansible.builtin.file', *_obj_files ) }}"
+        parser:
+          name: ansible.utils.textfsm
+          template_path: cisco_ios_raw_object-group.textfsm
+        set_fact: obj_grp_parsed
+
+
+    - name: Update Object-group configuration
+      cisco.ios.ios_config:
+        before: "no {{ item['GROUPNAME']  }}"
+        parents: "{{ item['GROUPNAME'] }}" 
+        lines: "{{ item['LINES'] }}"
+        replace: block
+        match: exact
+      loop: "{{ obj_grp_parsed }}"
+  when: 
+    - _obj_files is defined 

@@ -1,0 +1,64 @@
+---
+# 1. gather layer-3 interfaces
+# 2. loop over interfaces where 'ipv4' exists
+#     execute show run command on interface including helper to identify user vlans
+#     store results in 'interfaces_with_ip' register
+# 3. loop over 'interfaces_with_ip' filtering for ip-helper line
+#     update the config on those interfaces with new helpers
+
+- name: "Gather layer-3 interfaces  #1"
+  cisco.ios.ios_facts:
+    gather_subset:
+      - "!all"
+    gather_network_resources:
+      - "l3_interfaces"
+
+- name: "Find L3 interfaces with DHCP #2"
+  ansible.netcommon.cli_command:
+    command: "sh run int {{ interface_name }} | inc interface | helper-address"
+  loop:
+    "{{ ansible_network_resources.l3_interfaces
+        | selectattr('ipv4', 'defined')
+        | map(attribute='name')
+        | list }}"
+  loop_control:
+    loop_var: interface_name
+  register: interfaces_with_ip
+
+- name: "Update interfaces #3"
+  cisco.ios.ios_config:
+    # diff_ignore_lines: ipv6 dhcp relay .*
+    before:
+      - "interface {{ interface_loop }}"
+      - "no ip helper-address 172.26.32.40"
+      - "no ip helper-address 172.29.85.35"
+      - "no ipv6 dhcp relay destination 2606:7EC0:2501:5032::40"
+      - "no ipv6 dhcp relay destination 2606:7EC0:1903:5A1B::35"
+    parents:
+      "interface {{ interface_loop }}"
+    lines:
+      - "ip helper-address {{ nac_helpers4[0] }}"
+      - "ip helper-address {{ nac_helpers4[1] }}"
+      - "ipv6 dhcp relay destination {{ nac_helpers6[0] | upper }}"
+      - "ipv6 dhcp relay destination {{ nac_helpers6[1] | upper }}"
+
+  loop:
+    "{{ interfaces_with_ip.results
+        | selectattr('stdout', 'contains', 'helper-address')
+        | map(attribute='interface_name') }}"
+  loop_control:
+    loop_var: interface_loop
+  register: helperupdate
+
+# - name: debug
+#   debug:
+#     msg:
+#       - "-----STEP-1-----------------------------------------------"
+#       - "{{ helperupdate }}"
+#       - "{{ ansible_network_resources.l3_interfaces }}"
+#       - "-----STEP-2-----------------------------------------------"
+#       - "{{ interfaces_with_ip }}"
+#       - "-----STEP-3-----------------------------------------------"
+#       - "{{ interfaces_with_ip.results
+#           | selectattr('stdout', 'contains', 'helper-address')
+#           | map(attribute='interface_name') }}"

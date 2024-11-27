@@ -1,0 +1,16 @@
+---
+- name: Permitted user accounts
+  no_log: true
+  cisco.ios.ios_user:
+    aggregate:
+      - name: "{{ vault_local_user1_name }}"
+        hashed_password:
+          type: 9
+          value: "{{ vault_local_user1_pwd }}"
+      - name: "{{ vault_local_user2_name }}"
+        hashed_password:
+          type: 9
+          value: "{{ vault_local_user2_pwd }}"
+    privilege: 15
+    update_password: on_create
+    purge: true

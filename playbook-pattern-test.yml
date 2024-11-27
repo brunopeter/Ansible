@@ -1,0 +1,13 @@
+---
+- name: "Patter Tester Playbook"
+  hosts: "{{ _hosts }}"
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: testing
+      ansible.builtin.debug:
+        msg:
+          - "Group names: {{ group_names }}"
+          # - "Hostname: {{ inventory_hostname }}"
+          # - "Groups: {{ groups }}"

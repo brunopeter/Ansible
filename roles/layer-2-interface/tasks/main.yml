@@ -1,0 +1,8 @@
+---
+- name: "NAC quarantine vlan"
+  ansible.builtin.include_tasks:
+    file: "quarantine-vlan.yml"
+
+- name: "NAC Layer-2 interface settings"
+  ansible.builtin.include_tasks:
+    file: "layer-2-interfaces.yml"

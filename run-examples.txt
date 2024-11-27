@@ -1,0 +1,30 @@
+# List installed inventory plugins
+ansible-doc -t inventory -l
+
+
+# ansible-playbook -u peter.e.bruno -k --ask-vault-pass compliance-piv.yml -i ./inventory/inventory-XXX.ini
+ansible-playbook -k --ask-vault-pass compliance-piv.yml -i ./inventory/inventory-XXX.ini
+
+ansible-inventory -i ./inventory/inventory-ACY.ini -y --list
+
+
+# ansible-playbook -k --ask-vault-pass compliance-piv.yml -i ./inventory/inventory-ACY.ini | tee -a ./logs/$(date +"%Y-%m-%d-%I-%M-%p").log
+ansible-playbook -k --ask-vault-pass playbook-piv-nac.yml -i ./inventory/inventory-ACY.ini | tee -a ./logs/$(date +"%Y-%m-%d-%I-%M-%p").log
+
+# using service account stored in vault
+ansible-playbook --ask-vault-pass playbook-piv-nac.yml -i ./inventory/nac-week-3.ini | tee -a ./logs/$(date +"%Y-%m-%d-%I-%M-%p").log
+
+# sh run | inc ^interface Vlan|helper-address|dhcp relay dest
+ansible-playbook --ask-vault-pass playbook-nac-helper-update.yml -i ./inventory/test-inventory-ACY.ini -vvvv
+
+# limit run to specific group
+ansible-playbook --ask-vault-pass playbook-piv-nac.yml -i ./inventory/nac-week-4.ini --limit Hawaii --check | tee -a ./logs/$(date +"%Y-%m-%d-%I-%M-%p").log
+
+# testing
+ansible-playbook playbook-nac-helper-update.yml -J -i ./test_inventory/test-inventory-ACY.ini -vvvvv | tee ./logs/live.log
+ansible-inventory -J -i ./inventory/test-inventory-ACY.ini --list
+
+# testing - layer-2
+ansible-playbook playbook-nac-layer-2.yml -J -i ./inventory/test-inventory-acy.ini -vvvvv | tee ./logs/live.log
+
+ansible-playbook playbook-nac-2-layer-3.yml -J -i ./test-inventory/test-inventory-ACY.ini -vvvvv --extra-vars "_hosts=all" | tee ./logs/live.log

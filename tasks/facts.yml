@@ -1,0 +1,64 @@
+---
+- name: "Playbook: facts -- Just the Facts"
+  cisco.ios.ios_facts:
+    gather_subset:
+      - min
+      - interfaces
+#    gather_network_resources:
+#      - snmp_server
+
+- name: "Playbook: facts -- Get v6 addresses in specific order"
+    # set fact to:
+    #     loopback, vlan850, vlan400, any
+    # in that order so we can later pull the first value from of list
+    # Requires:  cisco_ios.ios_facts: gather_subset: interfaces
+  ansible.builtin.set_fact:
+    mgmt_ipv6: [
+      "{{ ansible_net_all_ipv6_addresses
+          | regex_search('FC00:7EC0:([0-9A-F]{1,4})::([0-9A-F]{0,4})') }}",
+      "{{ ansible_net_all_ipv6_addresses
+          | regex_search('FC00:7EC0:([0-9A-F]{1,4}):A([0-9A-F]{2})::([0-9A-F]{0,4})') }}",
+      "{{ ansible_net_all_ipv6_addresses
+          | regex_search('2606:7EC0:([0-9A-F]{1,4}):1([0-9A-F]{3})::([0-9A-F]{0,4})') }}",
+      "{{ ansible_net_all_ipv6_addresses[0] | default('') }}"
+    ]
+
+- name: "Playbook: facts -- Set Fact - v4 and v6 Management IP's"
+  # set mgmt_ipv4 to ip address used by ansible inventory
+  # set mgmt_ipv6 to first non-blank value or ""
+  ansible.builtin.set_fact:
+    mgmt_ipv4: "{{ ansible_ssh_host }}"
+    mgmt_ipv6: "{{ mgmt_ipv6 | select() | first | default('') }}"
+
+
+# - name: Debugging
+#   ansible.builtin.debug:
+#     msg:
+#       - "{{ ansible_facts.net_model }}"
+#       - "{{ ansible_facts }}"
+#       - "{{ ansible_ssh_host }}"
+
+# - name: Debugging2
+#   ansible.builtin.debug:
+#     msg: "switch model found: {{ ansible_facts.net_model }}"
+#   when:
+#     (ansible_facts.net_model[0:8] in
+#     ['WS-C3850', 'WS-C3650',
+#     'WS-C3560'])
+#     or
+#     (ansible_facts.net_model[0:6] in
+#     ['C9300-', 'C9200-'])
+
+# - name: debug
+#   debug:
+#     msg:
+#       - "-----STEP-1-----------------------------------------------"
+#       - "ansible_net_all_ipv6_addresses: {{ ansible_net_all_ipv6_addresses }}"
+#       - "loopback: {{ ansible_net_all_ipv6_addresses
+#           | regex_search('FC00:7EC0:([0-9A-F]{0,4})::([0-9A-F]{0,4})')}}"
+#       - "vlan850: {{ ansible_net_all_ipv6_addresses
+#           | regex_search('FC00:7EC0:([0-9A-F]{0,4}):A([0-9A-F]{0,2})::([0-9A-F]{0,4})')}}"
+#       - "vlan 400: {{ ansible_net_all_ipv6_addresses
+#           | regex_search('2606:7EC0:([0-9A-F]{0,4}):1([0-9A-F]{0,3})::([0-9A-F]{0,4})')}}"
+#       - "any v6: {{ ansible_net_all_ipv6_addresses[0] }}"
+#       - "dummy: {{ ansible_net_all_ipv6_addresses | regex_search('FCZZ:7EC0:([0-9A-F]{0,4})::([0-9A-F]{0,4})') }}"

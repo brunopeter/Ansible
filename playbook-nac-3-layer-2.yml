@@ -1,0 +1,21 @@
+---
+- name: NAC Layer-2 Interface Update
+  hosts: "{{ _hosts }}"
+  strategy: ansible.builtin.free
+  gather_facts: false
+
+  vars:
+    ansible_command_timeout: 240
+
+  tasks:
+    - name: "NAC layer-2 interfaces"
+      ansible.builtin.include_role:
+        name: layer-2-interface
+
+    - name: "Port Security - Remove"
+      ansible.builtin.include_role:
+        name: port-security
+
+    - name: Save when modified
+      cisco.ios.ios_config:
+        save_when: modified

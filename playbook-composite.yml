@@ -1,0 +1,40 @@
+---
+# Composite switch configuration
+- name: "Composite Switch Configuration"
+  hosts: "{{ _hosts }}"
+  gather_facts: false
+
+  tasks:
+    # TODO: configuration templates
+    # - name: "Configuration templates"
+    #   cisco.ios.ios_config:
+    #     src: "{{ item }}"
+    #   loop:
+    #     # - "./templates/dns"
+    #     # - "./templates/aaaa"
+    #     # - "./templates/snmpprime"
+    #     # - "./templates/snmpnac"
+    #     # - "./templates/snmpeoc"
+    #     # - "./templates/snmpeocsolarwinds"
+    #     # - "./templates/snmpcsmc"
+    #     # - "./templates/snmpcleanup"
+    #     # - "./templates/tacacs"
+    #     # - "./templates/users"
+    #     # - "./templates/logginghost"
+    #     # - "./templates/banner.j2"
+    #   loop_control:
+    #     loop_var: item
+
+    - name: "Banner"
+      cisco.ios.ios_banner:
+        banner: login
+        text: "{{ lookup('file', './templates/banner.j2') }}"
+        state: present
+
+      vars:
+        ansible_command_timeout: 240
+
+    - name: Save when modified
+      cisco.ios.ios_config:
+        save_when: modified
+        # save_when: changed

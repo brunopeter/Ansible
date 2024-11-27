@@ -1,0 +1,27 @@
+!
+ip access-list extended CP_Quarantine-v4-in
+ 10 permit udp any object-group FAA-Networks eq bootps
+ 20 permit object-group BT-ports any object-group AIT-BT-Servers
+ 30 permit tcp any object-group CP-Appliances eq 443
+ 40 deny   object-group deny-mgmt-ports any any
+ 50 permit object-group icmp any object-group IB-Servers
+ 60 permit object-group generic-any-port any object-group IB-Servers
+ 70 permit object-group generic-any-port any object-group AD-Servers
+ 80 permit object-group generic-any-port any object-group CP-Appliances
+ 90 permit object-group generic-any-port any object-group Tanium-Servers
+ 100 permit object-group generic-any-port any object-group SOC-Tenable-Servers
+ 5000 deny   ip any any
+!
+ipv6 access-list CP_Quarantine-v6-in
+ sequence 10 permit object-group icmp6-core any any
+ sequence 20 permit udp any object-group FAA6-Networks eq 547
+ sequence 30 permit tcp any object-group CP6-Appliances eq 443
+ sequence 40 deny object-group deny-mgmt6-ports any any
+ sequence 50 permit object-group icmp6 any object-group IB6-Servers
+ sequence 60 permit object-group generic-any6-port any object-group IB6-Servers
+ sequence 70 permit object-group generic-any6-port any object-group AD6-Servers
+ sequence 80 permit object-group generic-any6-port any object-group  CP6-Appliances
+ sequence 90 permit object-group generic-any6-port any object-group  Tanium6-Servers
+ sequence 100 permit object-group generic-any6-port any object-group SOC-Tenable6-Servers
+ sequence 5000 deny ipv6 any any
+!

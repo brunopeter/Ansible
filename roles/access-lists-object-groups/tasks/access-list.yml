@@ -1,0 +1,19 @@
+---
+- name: "Import ACLs, parse, and apply to device"
+  # NOTE: access-list blocks must begin and
+  #       end with a '!' or they will not be parsed properly.
+  block:
+    - name: "Parse access-list templates"
+      cisco.ios.ios_acls:
+        running_config:
+          "{{ lookup('ansible.builtin.file', *_acl_files ) }}"
+        state: parsed
+      register: parsed_acls_files
+
+
+    - name: "Apply ACLs"
+      cisco.ios.ios_acls:
+        config: "{{ parsed_acls_files.parsed }}"
+        state: replaced
+  when: 
+    - _acl_files is defined

@@ -1,0 +1,46 @@
+!
+object-group service deny-mgmt-ports 
+tcp eq 22
+tcp eq 80
+tcp eq 443
+udp eq 69
+tcp eq 23
+udp eq 3389
+!
+object-group v6-service deny-mgmt6-ports 
+tcp eq 22
+tcp eq 80
+tcp eq 443
+udp eq 69
+tcp eq 23
+udp eq 3389
+!
+object-group service BT-ports
+tcp eq 80
+tcp eq 443
+!
+object-group service BT6-ports
+tcp eq 80
+tcp eq 443
+!
+object-group service generic-any-port 
+tcp
+udp
+!
+object-group v6-service generic-any6-port 
+tcp
+udp
+!
+object-group service icmp 
+icmp echo
+icmp echo-reply
+!
+object-group v6-service icmp6 
+icmp echo-request
+icmp echo-reply
+!
+object-group v6-service icmp6-core 
+icmp packet-too-big
+icmp nd-na
+icmp nd-ns
+!

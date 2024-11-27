@@ -1,0 +1,16 @@
+---
+- name: SSH certificate profile
+  cisco.ios.ios_config:
+    parents:
+      - ip ssh server certificate profile
+      - user
+    lines:
+      - trustpoint verify DOT-CA-G5
+      - trustpoint verify DOT-CA-G6
+
+# - name: SSH Algorithm
+#   cisco.ios.ios_config:
+#     lines:
+#       - ip ssh server algorithm hostkey ssh-rsa
+#       - ip ssh server algorithm authentication publickey password keyboard
+#       - ip ssh server algorithm publickey x509v3-ssh-rsa

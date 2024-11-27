@@ -1,0 +1,18 @@
+---
+# Reference link:
+# https://www.digitalocean.com/community/tutorials/how-to-use-vault-to-protect-sensitive-ansible-data
+
+vault_ansible_user: user.name
+vault_ansible_become_password: enable_password
+
+vault_local_user1_name: local_user1
+vault_local_user1_pwd: hashed_type_9_password
+
+vault_local_user2_name: local_user2
+vault_local_user2_pwd: hashed_type_9_password
+
+vault_nac_radius_key: radius_key
+
+vault_nac_user: nac_snmpv3_username
+vault_nac_auth: nac_auth
+vault_nac_priv: nac_priv

@@ -1,0 +1,21 @@
+---
+plugin: dna_center
+# dnac_version: '2.3.5.6'
+dnac_version: '2.3.5.3'
+validate_certs: False
+use_dnac_mgmt_int: True
+api_record_limit: 10
+# hostname_filter: NJ-ACY-WJHTC-T.*
+# hostname_filter: .*
+# toplevel:
+keyed_groups:
+- prefix: state
+  key: host_data.hostname.split('-')[0]
+- prefix: lid
+  key: host_data.hostname.split('-')[1]
+- prefix: fac
+  key: host_data.hostname.split('-')[2]
+- prefix: role
+  key: host_data.hostname.split('-')[3]
+- prefix: version
+  key: host_data.softwareVersion

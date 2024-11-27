@@ -1,0 +1,20 @@
+---
+# MFA, NAC & NTP Remediation job
+- name: Compliance Check - Local User Accounts
+  hosts: "{{ _hosts }}"
+  # strategy: ansible.builtin.free
+  gather_facts: false
+  vars_files:
+     - "./inventory/group_vars/all/vault.yml"
+
+  tasks:
+    - name: "Configuration blocks"
+      ansible.builtin.include_tasks:
+        file: "./tasks/users.yml"
+      vars:
+        ansible_command_timeout: 60
+
+    - name: Save when modified
+      cisco.ios.ios_config:
+        # save_when: modified
+        save_when: changed

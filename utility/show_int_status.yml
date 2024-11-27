@@ -1,0 +1,16 @@
+---
+- name: Show interface
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Show interface 
+      cisco.ios.ios_command:
+        commands:
+          - "show int status | ex trunk|routed|Port"
+      register: output
+
+    - name: Print output
+      ansible.builtin.debug:
+        # var: output.stdout_lines
+        msg: "{{ output.stdout_lines }}"

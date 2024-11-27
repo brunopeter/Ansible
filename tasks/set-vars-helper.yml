@@ -1,0 +1,179 @@
+---
+- name: "Playbook: Set Vars -- Get vars from region-var-reference-help.yml"
+  ansible.builtin.include_vars:
+    # file: "./inventory/group_vars/region-var-reference.yml"
+    file: "region-var-reference.yml"
+
+- name: "Playbook: Set Vars -- Remove whitespace - net_hostname"
+  # Device may have whitespace as part of hostname, remove it before parsing.
+  ansible.builtin.set_fact:
+    device_hostname: "{{ ansible_facts.net_hostname | trim }}"
+
+- name: "Playbook: Set Vars -- Parse device name & set facts"
+  ansible.builtin.set_fact:
+    # device_state: "{{ ansible_facts.net_hostname[0:2] }}"
+    # device_lidfac: "{{ ansible_facts.net_hostname[0:12] }}"
+    device_state: "{{ device_hostname[0:2] }}"
+    device_lidfac: "{{ device_hostname[0:12] }}"
+
+# settings based on NAC appliance mapping assignments
+- name: "Set facts NAC NESA"
+  ansible.builtin.set_fact:
+    nac_helpers4: "{{ NAC_NESA.Helpers4 }}"
+    nac_helpers6: "{{ NAC_NESA.Helpers6 }}"
+  when:
+    device_state in
+    [ 'ME', 'VT', 'NH', 'CT', 'MA', 'RI']
+
+- name: "Set facts NAC CESA"
+  ansible.builtin.set_fact:
+    nac_helpers4: "{{ NAC_CESA.Helpers4 }}"
+    nac_helpers6: "{{ NAC_CESA.Helpers6 }}"
+  when:
+    device_state in
+     [ 'NY', 'NJ', 'PA', 'DE', 'MD', 'WV', 'VA']
+
+- name: "Set facts NAC SESA"
+  ansible.builtin.set_fact:
+    nac_helpers4: "{{ NAC_SESA.Helpers4 }}"
+    nac_helpers6: "{{ NAC_SESA.Helpers6 }}"
+  when:
+    device_state in
+    [ 'NC', 'SC', 'GA', 'FL', 'AL', 'MS', 'TN', 'KY']
+
+- name: "Set facts NAC NCSA"
+  ansible.builtin.set_fact:
+    nac_helpers4: "{{ NAC_NCSA.Helpers4 }}"
+    nac_helpers6: "{{ NAC_NCSA.Helpers6 }}"
+  when:
+    device_state in
+    [ 'OH', 'IN', 'MI', 'WI', 'IL']
+
+- name: "Set facts NAC CCSA"
+  ansible.builtin.set_fact:
+    nac_helpers4: "{{ NAC_CCSA.Helpers4 }}"
+    nac_helpers6: "{{ NAC_CCSA.Helpers6 }}"
+  when:
+    device_state in
+    [ 'ND', 'SD', 'MN', 'WI', 'NE', 'IA', 'KS', 'MO']
+
+- name: "Set facts NAC SCSA"
+  ansible.builtin.set_fact:
+    nac_helpers4: "{{ NAC_SCSA.Helpers4 }}"
+    nac_helpers6: "{{ NAC_SCSA.Helpers6 }}"
+  when:
+    device_state in
+    [ 'NM', 'TX', 'OK', 'AR', 'LA', 'NV', 'AZ']
+
+- name: "Set facts NAC NWSA"
+  ansible.builtin.set_fact:
+    nac_helpers4: "{{ NAC_NWSA.Helpers4 }}"
+    nac_helpers6: "{{ NAC_NWSA.Helpers6 }}"
+  when:
+    device_state in
+    [ 'WA', 'OR', 'MT', 'WY', 'CO', 'UT', 'ID', 'CA', 'HI']
+
+- name: "Set facts AK - Alaska"
+  ansible.builtin.set_fact:
+    nac_helpers4: "{{ NAC_AK.Helpers4 }}"
+    nac_helpers6: "{{ NAC_AK.Helpers6 }}"
+  when:
+    device_state in ['AK']
+
+- name: "Set facts ACY"
+  ansible.builtin.set_fact:
+    nac_helpers4: "{{ NAC_ACY.Helpers4 }}"
+    nac_helpers6: "{{ NAC_ACY.Helpers6 }}"
+  when:
+    device_lidfac in ['NJ-ACY-WJHTC']
+
+# - name: "Set facts AMC"
+#   ansible.builtin.set_fact:
+#     nac_helpers4: "{{ NAC_AMC.Helpers4 }}"
+#     nac_helpers6: "{{ NAC_AMC.Helpers6 }}"
+#   when:
+#     device_lidfac in ['OK-AMC-HDQ'] ???
+
+- name: "Set facts AWA / HQ"
+  ansible.builtin.set_fact:
+    nac_helpers4: "{{ NAC_AWA.Helpers4 }}"
+    nac_helpers6: "{{ NAC_AWA.Helpers6 }}"
+  when:
+    device_lidfac in ['DC-RWA-HDQ0']
+
+- name: "Set facts ANE / MA-RBN-HDQ"
+  ansible.builtin.set_fact:
+    nac_helpers4: "{{ NAC_ANE.Helpers4 }}"
+    nac_helpers6: "{{ NAC_ANE.Helpers6 }}"
+  when:
+    device_lidfac in ['MA-RBN-HDQ0']
+
+- name: "Set facts AEA / NY-AFD-HDQ"
+  ansible.builtin.set_fact:
+    nac_helpers4: "{{ NAC_AEA.Helpers4 }}"
+    nac_helpers6: "{{ NAC_AEA.Helpers6 }}"
+  when:
+    device_lidfac in ['NY-AFD-HDQ']
+
+- name: "Set facts ASO / GA-RTL-HDQ"
+  ansible.builtin.set_fact:
+    nac_helpers4: "{{ NAC_ASO.Helpers4 }}"
+    nac_helpers6: "{{ NAC_ASO.Helpers6 }}"
+  when:
+    device_lidfac in ['GA-RTL-HDQ']
+
+- name: "Set facts AGL / IL-RGC-HDQ"
+  ansible.builtin.set_fact:
+    nac_helpers4: "{{ NAC_AGL.Helpers4 }}"
+    nac_helpers6: "{{ NAC_AGL.Helpers6 }}"
+  when:
+    device_lidfac in ['IL-RGC-HDQ']
+
+- name: "Set facts ACE / MO-CAF-HDQ"
+  ansible.builtin.set_fact:
+    nac_helpers4: "{{ NAC_CAF.Helpers4 }}"
+    nac_helpers6: "{{ NAC_CAF.Helpers6 }}"
+  when:
+    device_lidfac in ['MO-CAF-HDQ']
+
+- name: "Set facts ASW / TX-FTW-HDQ"
+  ansible.builtin.set_fact:
+    nac_helpers4: "{{ NAC_ASW.Helpers4 }}"
+    nac_helpers6: "{{ NAC_ASW.Helpers6 }}"
+  when:
+    device_lidfac in ['TX-FTW-HDQ']
+
+- name: "Set facts AAL / AK-ANC-HDQ"
+  ansible.builtin.set_fact:
+    nac_helpers4: "{{ NAC_AAL.Helpers4 }}"
+    nac_helpers6: "{{ NAC_AAL.Helpers6 }}"
+  when:
+    device_lidfac in ['AK-ANC-HDQ']
+
+- name: "Set facts ANM / WA-SEA-HDQ"
+  ansible.builtin.set_fact:
+    nac_helpers4: "{{ NAC_ANM.Helpers4 }}"
+    nac_helpers6: "{{ NAC_ANM.Helpers6 }}"
+  when:
+    device_lidfac in ['WA-SEA-HDQ']
+
+- name: "Set facts AWP / CA-AWP-HDQ"
+  ansible.builtin.set_fact:
+    nac_helpers4: "{{ NAC_AWP.Helpers4 }}"
+    nac_helpers6: "{{ NAC_AWP.Helpers6 }}"
+  when:
+    device_lidfac in ['CA-AWP-HDQ']
+
+# - name: Debugging2
+#   ansible.builtin.debug:
+#     msg:
+#       - "device_state: {{ device_state }} -- device_lidfac: {{ device_lidfac }}"
+#       - "{{ ansible_facts.net_hostname }}"
+#       - "NAC4: {{ nac_helpers4 }}"
+#       - "NAC4-1 client {{ nac_helpers4[0] }}"
+#       - "NAC4-2 client {{ nac_helpers4[1] }}"
+#       - "NAC4-3 client {{ nac_helpers4[2] }}"
+#       - "NAC6: {{ nac_helpers6 }}"
+#       - "NAC6-1 client {{ nac_helpers6[0] }}"
+#       - "NAC6-2 client {{ nac_helpers6[1] }}"
+#       - "NAC6-3 client {{ nac_helpers6[2] }}"

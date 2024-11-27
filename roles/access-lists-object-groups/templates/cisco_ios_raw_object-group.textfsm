@@ -1,0 +1,59 @@
+Value GROUPNAME (object-group\s(network|service|v6-network|v6-service)\s\S+)
+Value List LINES ((description|icmp|ip|no|host|tcp|tcp-udp|udp).*)
+
+Start
+  ^object-group -> Continue.Record
+  ^${GROUPNAME}$$
+  ^\s${LINES}$$
+  ^\s*$$ -> Record
+
+
+## Example input data
+# object-group network TEST-obj-1
+#  host 192.168.1.11
+#  host 192.168.1.12
+#  host 192.168.1.13
+#  host 192.168.1.14
+# object-group network TEST-obj-2
+#  host 192.168.2.21
+#  host 192.168.2.22
+#  host 192.168.2.33
+# object-group service TEST-ports
+#  tcp eq 22
+#  tcp eq www
+#  tcp eq 443
+#  udp eq tftp
+#  tcp eq telnet
+#  udp eq 3389
+
+## Example should produce below output
+# [
+#     {
+#         "GROUPNAME": "object-group network TEST-obj-1",
+#         "LINES": [
+#             "host 192.168.1.11",
+#             "host 192.168.1.12",
+#             "host 192.168.1.13",
+#             "host 192.168.1.14"
+#         ]
+#     },
+#     {
+#         "GROUPNAME": "object-group network TEST-obj-2",
+#         "LINES": [
+#             "host 192.168.2.21",
+#             "host 192.168.2.22",
+#             "host 192.168.2.33"
+#         ]
+#     },
+#     {
+#         "GROUPNAME": "object-group service TEST-ports",
+#         "LINES": [
+#             "tcp eq 22",
+#             "tcp eq www",
+#             "tcp eq 443",
+#             "udp eq tftp",
+#             "tcp eq telnet",
+#             "udp eq 3389"
+#         ]
+#     }
+# ]

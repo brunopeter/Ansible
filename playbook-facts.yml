@@ -1,0 +1,20 @@
+---
+- name: Just the Facts
+  hosts: "{{ _hosts }}"
+  gather_facts: false
+
+  tasks:
+    - name: Gather
+      cisco.ios.ios_facts:
+        gather_subset:
+          # - min
+          - all
+      register: output
+
+    - name: Debugging
+      ansible.builtin.debug:
+        msg:
+          # - "{{ ansible_facts.net_model }}"
+          # - "{{ ansible_ssh_host }}"
+          # - "{{ ansible_facts }}"
+          - "{{ output }}"

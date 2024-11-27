@@ -1,0 +1,12 @@
+{# Interface (multiple hosts on non-trunked interface – non Voip) #}
+authentication event server dead action authorize 
+authentication event server dead action authorize voice
+authentication event server alive action reinitialize 
+authentication host-mode multi-auth
+authentication order mab
+authentication priority mab
+authentication port-control auto
+authentication periodic
+authentication timer reauthenticate 14405
+authentication timer restart 300
+mab

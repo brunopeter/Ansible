@@ -1,0 +1,15 @@
+---
+## Requires  cisco.ios.ios_facts for device specific action
+- name: NAC commands - Device Tracking
+  cisco.ios.ios_config:
+    before: 
+      - device-tracking upgrade-cli force
+    lines: 
+      - device-tracking tracking auto-source override
+  when: 
+    (ansible_facts.net_model[0:8] in 
+    ['WS-C3850', 'WS-C3650', ])
+    or 
+    (ansible_facts.net_model[0:6] in 
+    ['C9300-', 'C9200-'])
+    #'WS-C4503', 'WS-C4506', 'WS-C4507', 'WS-C4510']

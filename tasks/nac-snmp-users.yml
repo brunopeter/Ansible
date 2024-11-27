@@ -1,0 +1,60 @@
+---
+- name: "NAC snmp settings - Groups"
+  cisco.ios.ios_config:
+    lines:
+      - "snmp-server group gNAC v3 priv write vFAA-NAC-Srvs access snmp3CP-1"
+      - "snmp-server group gNAC v3 auth context vlan- match prefix"
+
+- name: "NAC snmp settings - Views & Users"
+  cisco.ios.ios_snmp_server:
+    state: merged
+    config:
+      views:
+        - name: vFAA-NAC-Srvs
+          family_name: iso
+          included: true
+          # snmp-server view vFAA-NAC-Srvs iso included
+      users:
+        - username: "{{ vault_nac_user }}"
+          group: gNAC
+          version: v3
+          authentication:
+            algorithm: sha
+            password: "{{ vault_nac_auth }}"
+          encryption:
+            priv: aes
+            priv_option: 128
+            password: "{{ vault_nac_priv }}"
+          # snmp-server user REMOVED gNAC v3 auth sha REMOVED priv aes 128 REMOVED access snmp3CP-1
+
+- name: "NAC snmp access-list"
+  # Note: some IOS versions remove the line numbers which may confuse ansible.
+  cisco.ios.ios_config:
+    parents: ip access-list standard snmp3CP-1
+    before: no ip access-list standard snmp3CP-1
+    replace: block
+    lines:
+      - 10 permit 172.29.182.14
+      - 20 permit 172.29.182.13
+      - 30 permit 172.27.250.100
+      - 40 permit 172.18.240.100
+      - 50 permit 172.17.152.100
+      - 60 permit 172.16.152.102
+      - 70 permit 172.21.152.100
+      - 80 permit 172.23.152.100
+      - 90 permit 172.19.191.100
+      - 100 permit 172.30.187.100
+      - 110 permit 172.20.152.131
+      - 120 permit 172.24.118.100
+      - 130 permit 172.29.85.46
+      - 140 permit 172.29.85.41
+      - 150 permit 172.22.8.100
+      - 160 permit 172.29.85.42 0.0.0.1
+      - 170 permit 172.29.85.44 0.0.0.1
+      - 180 permit 172.25.201.204 0.0.0.1
+      - 190 permit 172.26.32.50 0.0.0.1
+      - 200 permit 172.26.32.52 0.0.0.2
+      - 210 permit 172.26.32.56 0.0.0.1
+      - 220 permit 172.16.152.100 0.0.0.1
+      - 600 deny   any log
+    

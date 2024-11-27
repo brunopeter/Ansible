@@ -1,0 +1,13 @@
+!
+ip access-list standard TESTING-1
+ 10 permit 192.168.11.1
+ 20 permit 192.168.12.2
+ 30 permit 192.168.13.3
+ 40 deny   any log
+!
+ip access-list standard TESTING-2
+ 10 permit 192.168.21.1
+ 20 permit 192.168.22.2
+ 30 permit 192.168.23.3
+ 40 deny   any log
+!

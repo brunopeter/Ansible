@@ -1,0 +1,17 @@
+---
+- name: "Access-list Testing"
+  hosts: "{{ _hosts }}"
+  gather_facts: false
+  
+  tasks:
+    - name: "Object-groups and Access-lists"
+      vars:
+        # Files are assumed to be in /files subdirectory
+        _acl_files:
+          - 'xample/access-list-1-and-2.j2'
+          - 'xample/access-list-3.j2'
+        _obj_files:
+          - 'xample/object-group-network.j2'
+          - 'xample/object-group-service.j2'
+      ansible.builtin.include_role:
+        name: access-lists-object-groups

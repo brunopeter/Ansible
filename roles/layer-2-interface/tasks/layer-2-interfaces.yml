@@ -1,0 +1,51 @@
+---
+# 1. gather layer-2 interfaces
+# 2. loop over interfaces where mode is 'access'
+#     and set commands required for NAC / ClearPass
+
+- name: "Gather layer-2 interfaces  #1"
+  cisco.ios.ios_facts:
+    gather_subset:
+      # - "!all"
+      - "all"
+    gather_network_resources:
+      - "l2_interfaces"
+
+- name: "Set interfaces configuration #2"
+  cisco.ios.ios_config:
+    parents: 
+      "interface {{ interface_loop }}"
+    lines:
+      - no cdp tlv app
+      - authentication event server dead action authorize
+      - authentication event server dead action authorize voice
+      - authentication event server alive action reinitialize
+      - authentication host-mode multi-domain
+      - authentication order mab
+      - authentication priority mab
+      - authentication port-control auto
+      - authentication periodic
+      - authentication timer reauthenticate 28800
+      - authentication timer restart 180
+      - mab
+      - ip dhcp snooping limit rate 10
+  loop:
+    "{{ ansible_network_resources.l2_interfaces
+        | selectattr('access', 'defined')
+        | map(attribute='name')
+        | list }}"
+  loop_control:
+    loop_var: interface_loop
+  # register: l2interfaces
+
+# - name: debug
+#   debug:
+#     msg:
+#       - "-----STEP-1-----------------------------------------------"
+# #       - "{{ helperupdate }}"
+# #       - "{{ ansible_network_resources.l3_interfaces }}"
+#       - "-----STEP-2-----------------------------------------------"
+#       - "{{ ansible_network_resources.l2_interfaces
+#           | selectattr('access', 'defined')
+#           | map(attribute='name')
+#           | list }}"

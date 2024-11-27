@@ -1,0 +1,12 @@
+---
+- name: "Create quarantine vlan"
+  cisco.ios.ios_vlans:
+    config:
+      - name: NAC-Q
+        vlan_id: 666
+        state: active
+        shutdown: disabled
+    state: merged
+
+# - name: "Lookup subnet assignments"
+# - name: "Assign v4/v6 subnet to vlan"

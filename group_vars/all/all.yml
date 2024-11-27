@@ -1,0 +1,13 @@
+---
+ansible_port: 22
+host_key_checking: False
+host_key_auto_add: True
+ansible_connection: ansible.netcommon.network_cli
+ansible_network_os: cisco.ios.ios
+ansible_become: yes
+ansible_become_method: enable
+# ansible_network_cli_ssh_type: paramiko
+ansible_network_cli_ssh_type: libssh
+ansible_user: "{{ vault_ansible_user }}"
+ansible_password: "{{ vault_ansible_password }}"
+ansible_become_password: "{{ vault_ansible_become_password }}"

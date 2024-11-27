@@ -1,0 +1,9 @@
+---
+- name: Check connectivity
+  hosts: all
+  gather_facts: no
+  connection: cisco.ios
+
+  tasks:
+    - name: Ping all nodes
+      ansible.builtin.ping:

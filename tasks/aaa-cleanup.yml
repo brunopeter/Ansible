@@ -1,0 +1,15 @@
+---
+# Intent is to remove the AAA command lines
+- name: AAA show command
+  cisco.ios.ios_command:
+    commands: 
+      - "show run | inc command"
+  register: output
+
+- name: AAA Cleanup
+  ansible.netcommon.cli_config:
+    config: "{{ aaa_item }}"
+  loop: "{{ output.stdout_lines[0] | map('regex_replace', '^', 'no ') }}"
+  loop_control:
+    loop_var: aaa_item
+  when: output.stdout[0] | length > 0
